@@ -1,0 +1,176 @@
+from PySide6 import (
+    QtWidgets,
+    QtGui,
+)
+from pydub import AudioSegment
+from ui_main import Ui_Form
+import random
+import json
+import sys
+import os
+
+if not os.path.isfile("settings.json"):
+    open("settings.json", "w").write(
+            json.dumps({
+                    "theme": "white",
+                })
+        )
+
+with open("settings.json") as settings:
+    settings = json.load(settings)
+
+class TCBPP(QtWidgets.QWidget):
+    def __init__(self):
+        super(TCBPP, self).__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+        app.setStyle("Fusion")
+
+        self.white_palette = QtGui.QPalette()
+        self.dark_palette = QtGui.QPalette()
+
+        self.dark_palette.setColor(QtGui.QPalette.Window, QtGui.QColor(53, 53, 53))
+        self.dark_palette.setColor(QtGui.QPalette.WindowText, QtGui.Qt.white)
+        self.dark_palette.setColor(QtGui.QPalette.Base, QtGui.QColor(25, 25, 25))
+        self.dark_palette.setColor(QtGui.QPalette.AlternateBase, QtGui.QColor(53, 53, 53))
+        self.dark_palette.setColor(QtGui.QPalette.ToolTipBase, QtGui.Qt.white)
+        self.dark_palette.setColor(QtGui.QPalette.ToolTipText, QtGui.Qt.white)
+        self.dark_palette.setColor(QtGui.QPalette.Text, QtGui.Qt.white)
+        self.dark_palette.setColor(QtGui.QPalette.Button, QtGui.QColor(53, 53, 53))
+        self.dark_palette.setColor(QtGui.QPalette.ButtonText, QtGui.Qt.white)
+        self.dark_palette.setColor(QtGui.QPalette.BrightText, QtGui.Qt.red)
+        self.dark_palette.setColor(QtGui.QPalette.Link, QtGui.QColor(42, 130, 218))
+        self.dark_palette.setColor(QtGui.QPalette.Highlight, QtGui.QColor(42, 130, 218))
+        self.dark_palette.setColor(QtGui.QPalette.HighlightedText, QtGui.Qt.black)
+        
+        match settings["theme"]:
+            case "white":
+                self.set_theme(False)
+                self.ui.dark_checkbox.setChecked(False)
+                self.ui.light_checkbox.setChecked(True)
+            case "dark":
+                self.set_theme(True)
+                self.ui.dark_checkbox.setChecked(True)
+                self.ui.light_checkbox.setChecked(False)
+        
+        if not os.path.isdir("clickpacks"):
+            os.mkdir("clickpacks")
+        
+        self.clickpacks = os.listdir("clickpacks") if os.listdir("clickpacks") != [] else ["No clickpacks!"]
+        self.ui.clickpack_combo.clear()
+        self.ui.clickpack_combo.addItems(self.clickpacks)
+        
+        self.connect()
+        
+        self.log_print("[INFO] Initialized")
+        self.log_warn("Softclicks and Hardclicks not avaible yet")
+    
+    def connect(self) -> None:
+        self.ui.dark_checkbox.clicked.connect(lambda: self.set_theme(True))
+        self.ui.light_checkbox.clicked.connect(lambda: self.set_theme(False))
+        self.ui.hc_checkbox.clicked.connect(lambda: self.ui.hc_spinbox.setEnabled(self.ui.hc_checkbox.isChecked()))
+        self.ui.sc_checkbox.clicked.connect(lambda: self.ui.sc_spinbox.setEnabled(self.ui.sc_checkbox.isChecked()))
+        self.ui.browse_button.clicked.connect(self.browse_replay)
+        self.ui.render_button.clicked.connect(self.render_audio)
+        self.ui.update_button.clicked.connect(self.fetch_clickpacks)
+        self.ui.about_button.clicked.connect(self.about)
+    
+    def about(self) -> None:
+        msg = QtWidgets.QMessageBox()
+        msg.setText('Оригинальный TCB - TobyAdd\nTCB++ - acid (aka cosmo aka ignitedoreo)')
+        msg.setWindowTitle("О TCB++")
+        msg.exec()
+    
+    def fetch_clickpacks(self) -> None:
+        self.clickpacks = os.listdir("clickpacks") if os.listdir("clickpacks") != [] else ["No clickpacks!"]
+        self.ui.clickpack_combo.clear()
+        self.ui.clickpack_combo.addItems(self.clickpacks)
+    
+    def set_theme(self, theme: bool) -> None:
+        match theme:
+            case False:
+                app.setPalette(self.white_palette)
+                app.setStyleSheet("")
+                settings["theme"] = "white"
+            case True:
+                app.setPalette(self.dark_palette)
+                app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
+                settings["theme"] = "dark"
+        with open("settings.json", "w") as file:
+            file.write(json.dumps(settings))
+    
+    def render_audio(self) -> None:  
+        if self.clickpacks == ["No clickpacks!"]:
+            self.log_error("No clickpacks!")
+            return
+        
+        self.ui.progress_bar.setValue(0)
+        ms_duration = ((float(self.ui.replay_table.item(self.ui.replay_table.rowCount() - 1, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+        output = AudioSegment.silent(duration=ms_duration + self.ui.ed_spinbox.value() * 1000)
+        self.ui.progress_bar.setMaximum(self.ui.replay_table.rowCount())
+        
+        holds = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/holds")
+        releases = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/releases")
+        self.log_info(f"Rendering {self.ui.replay_table.rowCount()} actions")
+        for i in range(self.ui.replay_table.rowCount()):
+            self.ui.progress_bar.setValue(self.ui.progress_bar.value() + 1)
+            if self.ui.replay_table.item(i, 1).text() == "Hold":
+                output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/holds/" + holds[random.randrange(len(holds))]), position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+            elif self.ui.replay_table.item(i, 1).text() == "Release":
+                output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/releases/" + releases[random.randrange(len(releases))]), position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+        
+        out_path, ok = QtWidgets.QFileDialog.getSaveFileName(None, f"Save to... (default - 'rendered.{'mp3' if self.ui.mp3_checkbox.isChecked() else 'wav'}')", None, f"Audio ({'*.mp3' if self.ui.mp3_checkbox.isChecked() else '*.wav'})")
+        if not ok:
+            out_path = f"rendered.{'mp3' if self.ui.mp3_checkbox.isChecked() else 'wav'}"
+            
+        if self.ui.mp3_checkbox.isChecked():
+            output.export(out_path, format="mp3", bitrate="320k")
+        else:
+            output.export(out_path, format="wav", bitrate="320k")
+        self.log_info("Done!")
+    
+    def browse_replay(self) -> None:
+        path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Plain Text (*.txt)")
+        if path and ok:
+            self.ui.replay_lineedit.setText(os.path.basename(path))
+            self.load_replay(path)
+            self.log_info("Replay loaded")
+        else:
+            self.log_error("Replay not loaded, something went wrong")
+    
+    
+    def load_replay(self, path: str) -> None:
+        replay_file = open(path)
+        replay_list = replay_file.readlines()
+        self.ui.fps_spinbox.setValue(round(float(replay_list[0].replace("\n", ""))))
+
+        self.ui.replay_table.setRowCount(len(replay_list) - 1)
+        for k, i in list(enumerate(replay_list))[1:]:
+            splited = i.split()
+            self.ui.replay_table.setItem(k - 1, 0, QtWidgets.QTableWidgetItem(splited[0]))
+            if (splited[1]) == "0":
+                self.ui.replay_table.setItem(k - 1, 1, QtWidgets.QTableWidgetItem("Release"))
+            elif (splited[1]) == "1":
+                self.ui.replay_table.setItem(k - 1, 1, QtWidgets.QTableWidgetItem("Hold"))
+        self.log_info("Successfully decoded replay!")
+    
+    def log_info(self, text: str) -> None:
+        self.ui.log.setPlainText(self.ui.log.toPlainText() + f"\n[INFO] {text}")
+    
+    def log_warn(self, text: str) -> None:
+        self.ui.log.setPlainText(self.ui.log.toPlainText() + f"\n[WARNING] {text}")
+    
+    def log_error(self, text: str) -> None:
+        self.ui.log.setPlainText(self.ui.log.toPlainText() + f"\n[ERROR] {text}")
+    
+    def log_print(self, text: str) -> None:
+        self.ui.log.setPlainText(self.ui.log.toPlainText() + text)
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+
+    window = TCBPP()
+    window.show()
+
+    sys.exit(app.exec())
