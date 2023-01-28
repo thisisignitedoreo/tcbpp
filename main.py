@@ -135,11 +135,13 @@ class TCBPP(QtWidgets.QWidget):
         self.log_info("Done!")
     
     def browse_replay(self) -> None:
-        path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Supported Macros (*.txt *.echo)")
+        path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Supported Macros (*.txt *.echo *.json)")
         if path and ok:
             self.ui.replay_lineedit.setText(os.path.basename(path))
             if os.path.basename(path).split(".")[-1] == "echo":
                 self.load_replay(path, 1)
+            if os.path.basename(path).split(".")[-1] == "json":
+                self.load_replay(path, 2)
             else:
                 self.log_warn("Could not determine macro type. Defaulting to \"Plain Text\"")
                 self.load_replay(path, 0)
@@ -151,7 +153,7 @@ class TCBPP(QtWidgets.QWidget):
     def load_replay(self, path: str, macro_type: int) -> None:
         if macro_type == 0:
             replay_list = open(path).readlines()
-            self.ui.fps_spinbox.setValue(round(float(replay_list[0].replace("\n", ""))))
+            self.ui.fps_spinbox.setValue(float(replay_list[0].replace("\n", "")))
 
             self.ui.replay_table.setRowCount(len(replay_list) - 1)
             
@@ -170,11 +172,9 @@ class TCBPP(QtWidgets.QWidget):
             self.log_info("Successfully decoded \"Plain Text\" replay!")
         elif macro_type == 1:
             json_data = json.load(open(path))
-            self.ui.fps_spinbox.setValue(round(json_data["FPS"]))
+            self.ui.fps_spinbox.setValue(json_data["FPS"])
             
             replay = self.convert([i["Hold"] for i in json_data["Echo Replay"]])
-            
-            self.log_debug(str(replay))
             
             self.ui.replay_table.setRowCount(len(replay) - 1)
             
@@ -186,6 +186,30 @@ class TCBPP(QtWidgets.QWidget):
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
             
             self.log_info("Successfully decoded \"EchoBot\" replay!")
+        elif macro_type == 2:
+            json_data = json.load(open(path))
+            self.ui.fps_spinbox.setValue(json_data["fps"])
+            
+            replay = [[i["frame"], i["player_1"]["click"], i["player_2"]["click"]] for i in json_data["macro"]]
+            
+            self.ui.replay_table.setRowCount(len(replay) - 1)
+            
+            for k, i in enumerate(replay):
+                self.ui.replay_table.setItem(k, 0, QtWidgets.QTableWidgetItem(str(i[0])))
+                if i[1] == 0:
+                    self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("None"))
+                elif i[1] == 1:
+                    self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Release"))
+                elif i[1] == 2:
+                    self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
+                if i[2] == 0:
+                    self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("None"))
+                elif i[2] == 1:
+                    self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Release"))
+                elif i[2] == 2:
+                    self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Hold"))
+            
+            self.log_info("Successfully decoded \"TasBot\" replay!")
     
     def convert(self, array: list) -> list:
         old = array[0]
