@@ -1,5 +1,6 @@
 from PySide6 import (
     QtWidgets,
+    QtCore,
     QtGui,
 )
 from pydub import AudioSegment
@@ -62,6 +63,7 @@ class TCBPP(QtWidgets.QWidget):
         self.ui.clickpack_combo.addItems(self.clickpacks)
         
         self.connect()
+        app.setWindowIcon(QtGui.QIcon(self.get_qpix_from_filename("assets/tcb-col.png")))
         
         self.log_print("[INFO] Initialized")
         self.log_warn("Softclicks and Hardclicks not avaible yet")
@@ -93,10 +95,12 @@ class TCBPP(QtWidgets.QWidget):
                 app.setPalette(self.white_palette)
                 app.setStyleSheet("")
                 settings["theme"] = "white"
+                self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-bl-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
             case True:
                 app.setPalette(self.dark_palette)
                 app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
                 settings["theme"] = "dark"
+                self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-col-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
         with open("settings.json", "w") as file:
             file.write(json.dumps(settings))
     
@@ -131,29 +135,66 @@ class TCBPP(QtWidgets.QWidget):
         self.log_info("Done!")
     
     def browse_replay(self) -> None:
-        path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Plain Text (*.txt)")
+        path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Supported Macros (*.txt *.echo)")
         if path and ok:
             self.ui.replay_lineedit.setText(os.path.basename(path))
-            self.load_replay(path)
+            if os.path.basename(path).split(".")[-1] == "echo":
+                self.load_replay(path, 1)
+            else:
+                self.log_warn("Could not determine macro type. Defaulting to \"Plain Text\"")
+                self.load_replay(path, 0)
+                
             self.log_info("Replay loaded")
         else:
             self.log_error("Replay not loaded, something went wrong")
     
-    
-    def load_replay(self, path: str) -> None:
-        replay_file = open(path)
-        replay_list = replay_file.readlines()
-        self.ui.fps_spinbox.setValue(round(float(replay_list[0].replace("\n", ""))))
+    def load_replay(self, path: str, macro_type: int) -> None:
+        if macro_type == 0:
+            replay_list = open(path).readlines()
+            self.ui.fps_spinbox.setValue(round(float(replay_list[0].replace("\n", ""))))
 
-        self.ui.replay_table.setRowCount(len(replay_list) - 1)
-        for k, i in list(enumerate(replay_list))[1:]:
-            splited = i.split()
-            self.ui.replay_table.setItem(k - 1, 0, QtWidgets.QTableWidgetItem(splited[0]))
-            if (splited[1]) == "0":
-                self.ui.replay_table.setItem(k - 1, 1, QtWidgets.QTableWidgetItem("Release"))
-            elif (splited[1]) == "1":
-                self.ui.replay_table.setItem(k - 1, 1, QtWidgets.QTableWidgetItem("Hold"))
-        self.log_info("Successfully decoded replay!")
+            self.ui.replay_table.setRowCount(len(replay_list) - 1)
+            
+            for k, i in list(enumerate(replay_list))[1:]:
+                splited = i.split()
+                self.ui.replay_table.setItem(k - 1, 0, QtWidgets.QTableWidgetItem(splited[0]))
+                if splited[1] == "0":
+                    self.ui.replay_table.setItem(k - 1, 1, QtWidgets.QTableWidgetItem("Release"))
+                elif splited[1] == "1":
+                    self.ui.replay_table.setItem(k - 1, 1, QtWidgets.QTableWidgetItem("Hold"))
+                if splited[2] == "0":
+                    self.ui.replay_table.setItem(k - 1, 2, QtWidgets.QTableWidgetItem("Release"))
+                elif splited[2] == "1":
+                    self.ui.replay_table.setItem(k - 1, 2, QtWidgets.QTableWidgetItem("Hold"))
+            
+            self.log_info("Successfully decoded \"Plain Text\" replay!")
+        elif macro_type == 1:
+            json_data = json.load(open(path))
+            self.ui.fps_spinbox.setValue(round(json_data["FPS"]))
+            
+            replay = self.convert([i["Hold"] for i in json_data["Echo Replay"]])
+            
+            self.log_debug(str(replay))
+            
+            self.ui.replay_table.setRowCount(len(replay) - 1)
+            
+            for k, i in enumerate(replay):
+                self.ui.replay_table.setItem(k, 0, QtWidgets.QTableWidgetItem(str(i[0])))
+                if i[1] == False:
+                    self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Release"))
+                elif i[1] == True:
+                    self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
+            
+            self.log_info("Successfully decoded \"EchoBot\" replay!")
+    
+    def convert(self, array: list) -> list:
+        old = array[0]
+        res = [[0, old]]
+        for k, i in enumerate(array):
+            if i != old:
+                res.append([k, i])
+            old = i
+        return res
     
     def log_info(self, text: str) -> None:
         self.ui.log.setPlainText(self.ui.log.toPlainText() + f"\n[INFO] {text}")
@@ -164,8 +205,18 @@ class TCBPP(QtWidgets.QWidget):
     def log_error(self, text: str) -> None:
         self.ui.log.setPlainText(self.ui.log.toPlainText() + f"\n[ERROR] {text}")
     
+    def log_debug(self, text: str) -> None:
+        self.ui.log.setPlainText(self.ui.log.toPlainText() + f"\n[DEBUG] {text}")
+    
     def log_print(self, text: str) -> None:
         self.ui.log.setPlainText(self.ui.log.toPlainText() + text)
+
+    def get_qpix_from_filename(self, path):
+        data_str = open(path, "rb").read()
+        qpix = QtGui.QPixmap()
+        qpix.loadFromData(data_str)
+        return qpix
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

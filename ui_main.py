@@ -28,15 +28,13 @@ class Ui_Form(object):
         Form.resize(766, 405)
         self.verticalLayout_3 = QVBoxLayout(Form)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.title_lablel = QLabel(Form)
-        self.title_lablel.setObjectName(u"title_lablel")
-        self.title_lablel.setStyleSheet(u"font-size: 32px;")
-        self.title_lablel.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_3.addWidget(self.title_lablel)
-
         self.theme_layout = QHBoxLayout()
         self.theme_layout.setObjectName(u"theme_layout")
+        self.icon = QLabel(Form)
+        self.icon.setObjectName(u"icon")
+
+        self.theme_layout.addWidget(self.icon)
+
         self.spacer_1 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.theme_layout.addItem(self.spacer_1)
@@ -220,12 +218,14 @@ class Ui_Form(object):
         self.main_layout.addLayout(self.settings_layout)
 
         self.replay_table = QTableWidget(Form)
-        if (self.replay_table.columnCount() < 2):
-            self.replay_table.setColumnCount(2)
+        if (self.replay_table.columnCount() < 3):
+            self.replay_table.setColumnCount(3)
         __qtablewidgetitem = QTableWidgetItem()
         self.replay_table.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
         self.replay_table.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.replay_table.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         self.replay_table.setObjectName(u"replay_table")
         sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy2.setHorizontalStretch(0)
@@ -270,7 +270,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Toby's Clickbot", None))
-        self.title_lablel.setText(QCoreApplication.translate("Form", u"Toby's Clickbot", None))
+        self.icon.setText("")
         self.light_checkbox.setText(QCoreApplication.translate("Form", u"Light", None))
         self.dark_checkbox.setText(QCoreApplication.translate("Form", u"Dark", None))
         self.about_button.setText(QCoreApplication.translate("Form", u"?", None))
@@ -288,7 +288,9 @@ class Ui_Form(object):
         ___qtablewidgetitem = self.replay_table.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Frame", None));
         ___qtablewidgetitem1 = self.replay_table.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("Form", u"Action", None));
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("Form", u"P1", None));
+        ___qtablewidgetitem2 = self.replay_table.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"P2", None));
         self.log_label.setText(QCoreApplication.translate("Form", u"LOG", None))
     # retranslateUi
 

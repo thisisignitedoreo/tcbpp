@@ -15,20 +15,14 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QLabel" name="title_lablel">
-     <property name="styleSheet">
-      <string notr="true">font-size: 32px;</string>
-     </property>
-     <property name="text">
-      <string>Toby's Clickbot</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="theme_layout">
+     <item>
+      <widget class="QLabel" name="icon">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="spacer_1">
        <property name="orientation">
@@ -311,7 +305,12 @@
        </column>
        <column>
         <property name="text">
-         <string>Action</string>
+         <string>P1</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>P2</string>
         </property>
        </column>
       </widget>
