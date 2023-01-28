@@ -9,12 +9,12 @@ $ python main.py
 ```
 [clickpack name]
 | 
-+-holds
++ holds
 | |
 | + 1.wav
 | + 2.wav
 | + 3.wav
-+-releases
++ releases
   |
   + 1.wav
   + 2.wav
