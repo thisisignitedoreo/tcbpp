@@ -26,4 +26,4 @@ Example in `clickpack` folder
 ![sc1](screenshot1.png)
 
 ## Links
-[TobyAdd's Discord](https://discord.gg/GVR9uWf5)
+[TobyAdd's Discord](https://discord.com/invite/mQHXzG72vU)
