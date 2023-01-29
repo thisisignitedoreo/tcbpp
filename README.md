@@ -1,4 +1,8 @@
+
+<img alt="logo" src="assets/tcb-col.png" height="128" width="128">
+
 # TCB++
+
 ## Quickstart
 ```
 $ pip install pyside6 pydub
