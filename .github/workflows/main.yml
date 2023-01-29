@@ -14,25 +14,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Package Windows Application
-      uses: JackMcKew/pyinstaller-action-windows@main
-      with:
-        path: .
-        spec: build.spec
     
-    - uses: actions/upload-artifact@v2
+    - name: Windows Build
+      uses: eric2788/pyinstaller-build@0.1.3
       with:
-        name: windows-build
-        path: dist/windows
-    
-    - name: Package Linux Application
-      uses: JackMcKew/pyinstaller-action-linux@main
-      with:
-        path: .
-        spec: build.spec
+        main: main
+        python_version: 3.11.1
+        artifact: windows-build
+        use-dependencies: true
+        no-console: true
 
     - uses: actions/upload-artifact@v2
       with:
         name: linux-build
-        path: dist/linux
+        path: dist/windows-build
