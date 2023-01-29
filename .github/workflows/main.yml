@@ -20,11 +20,12 @@ jobs:
       with:
         main: main
         python_version: 3.11.1
+        pyinstaller_version: 5.7.0
         artifact: windows-build
         use-dependencies: true
         no-console: true
 
     - uses: actions/upload-artifact@v2
       with:
-        name: linux-build
+        name: windows-build
         path: dist/windows-build
