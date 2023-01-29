@@ -1,2 +1,2 @@
-PySide6
-pydub
+PySide6==6.4.2
+pydub==0.25.1
