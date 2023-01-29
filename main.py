@@ -9,6 +9,7 @@ import random
 import json
 import sys
 import os
+import io
 
 if not os.path.isfile("settings.json"):
     open("settings.json", "w").write(
@@ -45,15 +46,14 @@ class TCBPP(QtWidgets.QWidget):
         self.dark_palette.setColor(QtGui.QPalette.Highlight, QtGui.QColor(42, 130, 218))
         self.dark_palette.setColor(QtGui.QPalette.HighlightedText, QtGui.Qt.black)
         
-        match settings["theme"]:
-            case "white":
-                self.set_theme(False)
-                self.ui.dark_checkbox.setChecked(False)
-                self.ui.light_checkbox.setChecked(True)
-            case "dark":
-                self.set_theme(True)
-                self.ui.dark_checkbox.setChecked(True)
-                self.ui.light_checkbox.setChecked(False)
+        if settings["theme"] == "white":
+            self.set_theme(False)
+            self.ui.dark_checkbox.setChecked(False)
+            self.ui.light_checkbox.setChecked(True)
+        elif settings["theme"] == "dark":
+            self.set_theme(True)
+            self.ui.dark_checkbox.setChecked(True)
+            self.ui.light_checkbox.setChecked(False)
         
         if not os.path.isdir("clickpacks"):
             os.mkdir("clickpacks")
@@ -90,17 +90,17 @@ class TCBPP(QtWidgets.QWidget):
         self.ui.clickpack_combo.addItems(self.clickpacks)
     
     def set_theme(self, theme: bool) -> None:
-        match theme:
-            case False:
-                app.setPalette(self.white_palette)
-                app.setStyleSheet("")
-                settings["theme"] = "white"
-                self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-bl-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
-            case True:
-                app.setPalette(self.dark_palette)
-                app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
-                settings["theme"] = "dark"
-                self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-col-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
+        if theme == False:
+            app.setPalette(self.white_palette)
+            app.setStyleSheet("")
+            settings["theme"] = "white"
+            self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-bl-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
+        elif theme == True:
+            app.setPalette(self.dark_palette)
+            app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
+            settings["theme"] = "dark"
+            self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-col-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
+        
         with open("settings.json", "w") as file:
             file.write(json.dumps(settings))
     
@@ -142,6 +142,8 @@ class TCBPP(QtWidgets.QWidget):
                 self.load_replay(path, 1)
             if os.path.basename(path).split(".")[-1] == "json":
                 self.load_replay(path, 2)
+            if os.path.basename(path).split(".")[-1] == "replay":
+                self.load_replay(path, 3)
             else:
                 self.log_warn("Could not determine macro type. Defaulting to \"Plain Text\"")
                 self.load_replay(path, 0)
@@ -210,6 +212,8 @@ class TCBPP(QtWidgets.QWidget):
                     self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Hold"))
             
             self.log_info("Successfully decoded \"TasBot\" replay!")
+        elif macro_type == 3:
+            self.log_debug("ReplayBot is not yet supported!")
     
     def convert(self, array: list) -> list:
         old = array[0]
