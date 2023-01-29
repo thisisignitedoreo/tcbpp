@@ -1,0 +1,31 @@
+
+name: pyinstaller build windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Package Windows Application
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: .
+    
+    - name: Package Linux Application
+      uses: JackMcKew/pyinstaller-action-linux@main
+      with:
+        path: .
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: name-of-artifact
+        path: src/dist/windows
