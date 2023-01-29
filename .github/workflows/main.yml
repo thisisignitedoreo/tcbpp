@@ -8,24 +8,26 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  pyinstaller-windows-build:
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Windows Build
-      uses: eric2788/pyinstaller-build@0.1.3
-      with:
-        main: main
-        python_version: 3.11.1
-        pyinstaller_version: 5.7.0
-        artifact: windows-build
-        use-dependencies: true
-        no-console: true
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: windows-build
-        path: dist/windows-build
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          python_ver: '3.11.1'
+          spec: 'main.py'
+          requirements: 'requirements.txt'
+          upload_exe_with_name: 'tcb++'
+          options: --onefile, --name "tcb++", --windowed, 
+          
+  pyinstaller-linux-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          python_ver: '3.11.1'
+          spec: 'main.py'
+          requirements: 'requirements.txt'
+          upload_exe_with_name: 'tcb++'
+          options: --onefile, --name "tcb++", --windowed, 
