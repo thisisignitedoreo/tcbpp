@@ -1,5 +1,5 @@
 
-name: pyinstaller build windows
+name: pyinstaller build
 
 on:
   push:
@@ -20,6 +20,11 @@ jobs:
       with:
         path: .
     
+    - uses: actions/upload-artifact@v2
+      with:
+        name: windows-build.exe
+        path: dist/windows
+    
     - name: Package Linux Application
       uses: JackMcKew/pyinstaller-action-linux@main
       with:
@@ -27,5 +32,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: name-of-artifact
-        path: src/dist/windows
+        name: linux-build
+        path: dist/linux
