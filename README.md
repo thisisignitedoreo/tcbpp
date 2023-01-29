@@ -20,7 +20,7 @@ $ python main.py
   + 2.wav
   + 3.wav
 ```
-Example in `clickpack` folder
+Example in `clickpacks` folder
 
 ## Gallery
 ![sc1](screenshot1.png)
