@@ -2,6 +2,7 @@
 <img alt="logo" src="assets/tcb-col.png" height="128" width="128">
 
 # TCB++
+Supported macro types: TasBot, EchoBot, Plain Text (frames)
 
 ## Quickstart
 ```shell
