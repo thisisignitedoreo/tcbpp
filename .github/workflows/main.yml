@@ -22,7 +22,7 @@ jobs:
     
     - uses: actions/upload-artifact@v2
       with:
-        name: windows-build.exe
+        name: windows-build
         path: dist/windows
     
     - name: Package Linux Application
