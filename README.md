@@ -14,16 +14,38 @@ $ python main.py
 ```
 [clickpack name]
 | 
-+ holds
++ softclicks (optional)
 | |
 | + 1.wav
 | + 2.wav
 | + 3.wav
-+ releases
-  |
-  + 1.wav
-  + 2.wav
-  + 3.wav
++ hardclicks (optional)
+| |
+| + 1.wav
+| + 2.wav
+| + 3.wav
++ p1
+| + holds
+| | |
+| | + 1.wav
+| | + 2.wav
+| | + 3.wav
+| + releases
+|   |
+|   + 1.wav
+|   + 2.wav
+|   + 3.wav
++ p2 (optional)
+  + holds
+  | |
+  | + 1.wav
+  | + 2.wav
+  | + 3.wav
+  + releases
+    |
+    + 1.wav
+    + 2.wav
+    + 3.wav
 ```
 Example in `clickpacks` folder
 
