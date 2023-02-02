@@ -66,7 +66,6 @@ class TCBPP(QtWidgets.QWidget):
         app.setWindowIcon(QtGui.QIcon(self.get_qpix_from_filename("assets/tcb-col.png")))
         
         self.log_print("[INFO] Initialized")
-        self.log_warn("Softclicks and Hardclicks not avaible yet")
     
     def connect(self) -> None:
         self.ui.dark_checkbox.clicked.connect(lambda: self.set_theme(True))
@@ -114,15 +113,74 @@ class TCBPP(QtWidgets.QWidget):
         output = AudioSegment.silent(duration=ms_duration + self.ui.ed_spinbox.value() * 1000)
         self.ui.progress_bar.setMaximum(self.ui.replay_table.rowCount())
         
-        holds = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/holds")
-        releases = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/releases")
+        p1_overrides_p2 = False
+
+        holds_p1 = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/holds")
+        releases_p1 = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/releases")
+        try:
+            holds_p2 = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p2/holds")
+            releases_p2 = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p2/releases")
+        except FileNotFoundError:
+            self.log_warn("No player 2 found in clickpack! Defaulting to player 1 clicks.")
+            p1_overrides_p2 = True
+            holds_p2 = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/holds")
+            releases_p2 = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/releases")
+        try:
+            softclicks = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/softclicks")
+        except FileNotFoundError:
+            self.log_warn("No softclicks found in clickpack! Turning it off.")
+            self.ui.sc_checkbox.setChecked(False)
+        try:
+            hardclicks = os.listdir("clickpacks/" + self.ui.clickpack_combo.currentText() + "/hardclicks")
+        except FileNotFoundError:
+            self.log_warn("No hardclicks found in clickpack! Turning it off.")
+            self.ui.hc_checkbox.setChecked(False)
         self.log_info(f"Rendering {self.ui.replay_table.rowCount()} actions")
         for i in range(self.ui.replay_table.rowCount()):
+            if i == 0:
+                delay = -1
+            else:
+                delay = ((int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000) - ((int(self.ui.replay_table.item(i - 1, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
             self.ui.progress_bar.setValue(self.ui.progress_bar.value() + 1)
-            if self.ui.replay_table.item(i, 1).text() == "Hold":
-                output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/holds/" + holds[random.randrange(len(holds))]), position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
-            elif self.ui.replay_table.item(i, 1).text() == "Release":
-                output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/releases/" + releases[random.randrange(len(releases))]), position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+            if delay <= self.ui.sc_spinbox.value() and self.ui.sc_checkbox.isChecked():
+                if self.ui.replay_table.item(i, 1).text() == "Hold":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/softclicks/" + softclicks[random.randrange(len(softclicks))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                elif self.ui.replay_table.item(i, 1).text() == "Release":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/releases/" + releases_p1[random.randrange(len(releases_p1))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                if self.ui.replay_table.item(i, 2).text() == "Hold":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/softclicks/" + softclicks[random.randrange(len(softclicks))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                elif self.ui.replay_table.item(i, 2).text() == "Release":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + f"/p{'1' if p1_overrides_p2 else '2'}/releases/" + releases_p2[random.randrange(len(releases_p2))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+            elif delay >= self.ui.hc_spinbox.value() and self.ui.hc_checkbox.isChecked():
+                if self.ui.replay_table.item(i, 1).text() == "Hold":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/hardclicks/" + hardclicks[random.randrange(len(hardclicks))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                elif self.ui.replay_table.item(i, 1).text() == "Release":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/releases/" + releases_p1[random.randrange(len(releases_p1))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                if self.ui.replay_table.item(i, 2).text() == "Hold":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/hardclicks/" + hardclicks[random.randrange(len(hardclicks))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                elif self.ui.replay_table.item(i, 2).text() == "Release":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + f"/p{'1' if p1_overrides_p2 else '2'}/releases/" + releases_p2[random.randrange(len(releases_p2))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+            else:
+                if self.ui.replay_table.item(i, 1).text() == "Hold":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/holds/" + holds_p1[random.randrange(len(holds_p1))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                elif self.ui.replay_table.item(i, 1).text() == "Release":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + "/p1/releases/" + releases_p1[random.randrange(len(releases_p1))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                if self.ui.replay_table.item(i, 2).text() == "Hold":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + f"/p{'1' if p1_overrides_p2 else '2'}/holds/" + holds_p2[random.randrange(len(holds_p2))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
+                elif self.ui.replay_table.item(i, 2).text() == "Release":
+                    output = output.overlay(AudioSegment.from_wav("clickpacks/" + self.ui.clickpack_combo.currentText() + f"/p{'1' if p1_overrides_p2 else '2'}/releases/" + releases_p2[random.randrange(len(releases_p2))]),
+                                            position=(int(self.ui.replay_table.item(i, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
         
         out_path, ok = QtWidgets.QFileDialog.getSaveFileName(None, f"Save to... (default - 'rendered.{'mp3' if self.ui.mp3_checkbox.isChecked() else 'wav'}')", None, f"Audio ({'*.mp3' if self.ui.mp3_checkbox.isChecked() else '*.wav'})")
         if not ok:
@@ -140,9 +198,9 @@ class TCBPP(QtWidgets.QWidget):
             self.ui.replay_lineedit.setText(os.path.basename(path))
             if os.path.basename(path).split(".")[-1] == "echo":
                 self.load_replay(path, 1)
-            if os.path.basename(path).split(".")[-1] == "json":
+            elif os.path.basename(path).split(".")[-1] == "json":
                 self.load_replay(path, 2)
-            if os.path.basename(path).split(".")[-1] == "replay":
+            elif os.path.basename(path).split(".")[-1] == "replay":
                 self.load_replay(path, 3)
             else:
                 self.log_warn("Could not determine macro type. Defaulting to \"Plain Text\"")
@@ -186,6 +244,7 @@ class TCBPP(QtWidgets.QWidget):
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Release"))
                 elif i[1] == True:
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
+                self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem(""))
             
             self.log_info("Successfully decoded \"EchoBot\" replay!")
         elif macro_type == 2:

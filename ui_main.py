@@ -25,7 +25,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(766, 405)
+        Form.resize(766, 403)
         self.verticalLayout_3 = QVBoxLayout(Form)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.theme_layout = QHBoxLayout()
@@ -126,12 +126,11 @@ class Ui_Form(object):
 
         self.fps_layout.addWidget(self.fps_label)
 
-        self.fps_spinbox = QSpinBox(Form)
+        self.fps_spinbox = QDoubleSpinBox(Form)
         self.fps_spinbox.setObjectName(u"fps_spinbox")
         self.fps_spinbox.setReadOnly(True)
-        self.fps_spinbox.setMinimum(1)
-        self.fps_spinbox.setMaximum(10000)
-        self.fps_spinbox.setValue(60)
+        self.fps_spinbox.setMaximum(10000.000000000000000)
+        self.fps_spinbox.setValue(60.000000000000000)
 
         self.fps_layout.addWidget(self.fps_spinbox)
 
@@ -142,15 +141,17 @@ class Ui_Form(object):
         self.hardclicks_layout.setObjectName(u"hardclicks_layout")
         self.hc_checkbox = QCheckBox(Form)
         self.hc_checkbox.setObjectName(u"hc_checkbox")
-        self.hc_checkbox.setEnabled(False)
+        self.hc_checkbox.setEnabled(True)
+        self.hc_checkbox.setChecked(True)
 
         self.hardclicks_layout.addWidget(self.hc_checkbox)
 
-        self.hc_spinbox = QDoubleSpinBox(Form)
+        self.hc_spinbox = QSpinBox(Form)
         self.hc_spinbox.setObjectName(u"hc_spinbox")
         self.hc_spinbox.setEnabled(False)
-        self.hc_spinbox.setMaximum(10000.000000000000000)
-        self.hc_spinbox.setSingleStep(0.500000000000000)
+        self.hc_spinbox.setMaximum(10000)
+        self.hc_spinbox.setSingleStep(10)
+        self.hc_spinbox.setValue(500)
 
         self.hardclicks_layout.addWidget(self.hc_spinbox)
 
@@ -161,15 +162,17 @@ class Ui_Form(object):
         self.softclicks_layout.setObjectName(u"softclicks_layout")
         self.sc_checkbox = QCheckBox(Form)
         self.sc_checkbox.setObjectName(u"sc_checkbox")
-        self.sc_checkbox.setEnabled(False)
+        self.sc_checkbox.setEnabled(True)
+        self.sc_checkbox.setChecked(True)
 
         self.softclicks_layout.addWidget(self.sc_checkbox)
 
-        self.sc_spinbox = QDoubleSpinBox(Form)
+        self.sc_spinbox = QSpinBox(Form)
         self.sc_spinbox.setObjectName(u"sc_spinbox")
         self.sc_spinbox.setEnabled(False)
-        self.sc_spinbox.setMaximum(10000.000000000000000)
-        self.sc_spinbox.setSingleStep(0.500000000000000)
+        self.sc_spinbox.setMaximum(10000)
+        self.sc_spinbox.setSingleStep(10)
+        self.sc_spinbox.setValue(200)
 
         self.softclicks_layout.addWidget(self.sc_spinbox)
 
@@ -252,7 +255,9 @@ class Ui_Form(object):
         self.log.setObjectName(u"log")
         sizePolicy2.setHeightForWidth(self.log.sizePolicy().hasHeightForWidth())
         self.log.setSizePolicy(sizePolicy2)
+        self.log.setLineWrapMode(QTextEdit.NoWrap)
         self.log.setReadOnly(True)
+        self.log.setTextInteractionFlags(Qt.TextSelectableByKeyboard)
 
         self.log_layout.addWidget(self.log)
 
@@ -269,7 +274,7 @@ class Ui_Form(object):
     # setupUi
 
     def retranslateUi(self, Form):
-        Form.setWindowTitle(QCoreApplication.translate("Form", u"Toby's Clickbot", None))
+        Form.setWindowTitle(QCoreApplication.translate("Form", u"tcb++", None))
         self.icon.setText("")
         self.light_checkbox.setText(QCoreApplication.translate("Form", u"Light", None))
         self.dark_checkbox.setText(QCoreApplication.translate("Form", u"Dark", None))
@@ -281,8 +286,12 @@ class Ui_Form(object):
         self.fps_label.setText(QCoreApplication.translate("Form", u"FPS:", None))
         self.fps_spinbox.setSuffix(QCoreApplication.translate("Form", u" FPS", None))
         self.hc_checkbox.setText(QCoreApplication.translate("Form", u"Hardclicks", None))
+        self.hc_spinbox.setSuffix(QCoreApplication.translate("Form", u" ms", None))
+        self.hc_spinbox.setPrefix("")
         self.sc_checkbox.setText(QCoreApplication.translate("Form", u"Softclicks", None))
-        self.ed_label.setText(QCoreApplication.translate("Form", u"End delay (seconds):", None))
+        self.sc_spinbox.setSuffix(QCoreApplication.translate("Form", u" ms", None))
+        self.ed_label.setText(QCoreApplication.translate("Form", u"End delay:", None))
+        self.ed_spinbox.setSuffix(QCoreApplication.translate("Form", u" seconds", None))
         self.mp3_checkbox.setText(QCoreApplication.translate("Form", u"Save as MP3 (compressed)", None))
         self.render_button.setText(QCoreApplication.translate("Form", u"Render!", None))
         ___qtablewidgetitem = self.replay_table.horizontalHeaderItem(0)

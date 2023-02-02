@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>766</width>
-    <height>405</height>
+    <height>403</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Toby's Clickbot</string>
+   <string>tcb++</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -175,23 +175,35 @@
          <item>
           <widget class="QCheckBox" name="hc_checkbox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>Hardclicks</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="hc_spinbox">
+          <widget class="QSpinBox" name="hc_spinbox">
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="suffix">
+            <string> ms</string>
+           </property>
+           <property name="prefix">
+            <string/>
+           </property>
            <property name="maximum">
-            <double>10000.000000000000000</double>
+            <number>10000</number>
            </property>
            <property name="singleStep">
-            <double>0.500000000000000</double>
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>500</number>
            </property>
           </widget>
          </item>
@@ -202,23 +214,32 @@
          <item>
           <widget class="QCheckBox" name="sc_checkbox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="text">
             <string>Softclicks</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="sc_spinbox">
+          <widget class="QSpinBox" name="sc_spinbox">
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="suffix">
+            <string> ms</string>
+           </property>
            <property name="maximum">
-            <double>10000.000000000000000</double>
+            <number>10000</number>
            </property>
            <property name="singleStep">
-            <double>0.500000000000000</double>
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>200</number>
            </property>
           </widget>
          </item>
@@ -229,12 +250,15 @@
          <item>
           <widget class="QLabel" name="ed_label">
            <property name="text">
-            <string>End delay (seconds):</string>
+            <string>End delay:</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QSpinBox" name="ed_spinbox">
+           <property name="suffix">
+            <string> seconds</string>
+           </property>
            <property name="minimum">
             <number>1</number>
            </property>
@@ -338,8 +362,14 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="lineWrapMode">
+          <enum>QTextEdit::NoWrap</enum>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextSelectableByKeyboard</set>
          </property>
         </widget>
        </item>
