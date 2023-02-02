@@ -6,7 +6,7 @@ Supported macro types: TasBot, EchoBot, Plain Text (frames)
 
 ## Quickstart
 ```shell
-$ pip install pyside6 pydub
+$ pip install -r requirements.txt
 $ python update_ffmpeg.py
 $ python main.py
 ```
