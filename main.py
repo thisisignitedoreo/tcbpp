@@ -68,8 +68,7 @@ class TCBPP(QtWidgets.QWidget):
         self.connect()
         app.setWindowIcon(QtGui.QIcon(self.get_qpix_from_filename("assets/tcb-col.png")))
 
-        # if shutil.which("ffmpeg") is None:
-        if True:
+        if shutil.which("ffmpeg") is None:
             ret = QtWidgets.QMessageBox.warning(self, "No FFMPEG found.", "No FFMPEG found. Do you want to download it?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
             if ret == QtWidgets.QMessageBox.Yes:
                 if not os.path.isdir("temp"):
