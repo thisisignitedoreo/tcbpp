@@ -4,8 +4,11 @@ from PySide6 import (
     QtGui,
 )
 from pydub import AudioSegment
+from pyunpack import Archive
 from ui_main import Ui_Form
+import requests
 import random
+import shutil
 import json
 import sys
 import os
@@ -64,6 +67,45 @@ class TCBPP(QtWidgets.QWidget):
         
         self.connect()
         app.setWindowIcon(QtGui.QIcon(self.get_qpix_from_filename("assets/tcb-col.png")))
+
+        # if shutil.which("ffmpeg") is None:
+        if True:
+            ret = QtWidgets.QMessageBox.warning(self, "No FFMPEG found.", "No FFMPEG found. Do you want to download it?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+            if ret == QtWidgets.QMessageBox.Yes:
+                if not os.path.isdir("temp"):
+                    os.mkdir("temp")
+
+                response = requests.get("https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z", stream=True)
+                total_length = response.headers.get('content-length')
+                ffmpeg = b""
+
+                if total_length is None:
+                    ffmpeg += response.content
+                else:
+                    dl = 0
+                    total_length = int(total_length)
+                    ffmpeg_progressbar = QtWidgets.QProgressDialog("Downloading FFMPEG", "Abort", 0, total_length)
+                    ffmpeg_progressbar.canceled.connect(app.quit)
+                    ffmpeg_progressbar.setModal(True)
+                    ffmpeg_progressbar.show()
+                    for data in response.iter_content(chunk_size=65536):
+                        app.processEvents()
+                        dl += len(data)
+                        ffmpeg += data
+                        ffmpeg_progressbar.setValue(dl)
+
+                open("temp/ffmpeg.7z", "wb").write(ffmpeg)
+
+                if not os.path.isdir("temp/ffmpeg"):
+                    os.mkdir("temp/ffmpeg")
+
+                Archive("temp/ffmpeg.7z").extractall("temp/ffmpeg/")
+                shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffmpeg.exe", "ffmpeg.exe")
+                shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffplay.exe", "ffplay.exe")
+                shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffprobe.exe", "ffprobe.exe")
+                
+                shutil.rmtree("temp")
+                ffmpeg_progressbar.hide()
         
         self.log_print("[INFO] Initialized")
     
