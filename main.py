@@ -93,6 +93,7 @@ class TCBPP(QtWidgets.QWidget):
                         dl += len(data)
                         ffmpeg += data
                         ffmpeg_progressbar.setValue(dl)
+                    ffmpeg_progressbar.hide()
 
                 open("temp/ffmpeg.7z", "wb").write(ffmpeg)
 
@@ -105,7 +106,6 @@ class TCBPP(QtWidgets.QWidget):
                 shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffprobe.exe", "ffprobe.exe")
                 
                 shutil.rmtree("temp")
-                ffmpeg_progressbar.hide()
         
         self.log_print("[INFO] Initialized")
     
