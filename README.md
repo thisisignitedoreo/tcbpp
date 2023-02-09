@@ -46,7 +46,7 @@ $ python main.py
     + 2.wav
     + 3.wav
 ```
-Example in `clickpacks` folder (its outdated and dont work sowwy)
+Example in `clickpacks` folder ~~(its outdated and dont work sowwy)~~ it works now
 
 ## Gallery
 ![sc1](screenshot1.png)
