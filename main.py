@@ -7,6 +7,7 @@ from pydub import AudioSegment
 from pyunpack import Archive
 from ui_main import Ui_Form
 import requests
+import struct
 import random
 import shutil
 import json
@@ -69,42 +70,45 @@ class TCBPP(QtWidgets.QWidget):
         app.setWindowIcon(QtGui.QIcon(self.get_qpix_from_filename("assets/tcb-col.png")))
 
         if shutil.which("ffmpeg") is None:
-            ret = QtWidgets.QMessageBox.warning(self, "No FFMPEG found.", "No FFMPEG found. Do you want to download it?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
-            if ret == QtWidgets.QMessageBox.Yes:
-                if not os.path.isdir("temp"):
-                    os.mkdir("temp")
+            if os.name == "nt":
+                ret = QtWidgets.QMessageBox.warning(self, "No FFMPEG found.", "No FFMPEG found. Do you want to download it?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+                if ret == QtWidgets.QMessageBox.Yes:
+                    if not os.path.isdir("temp"):
+                        os.mkdir("temp")
 
-                response = requests.get("https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z", stream=True)
-                total_length = response.headers.get('content-length')
-                ffmpeg = b""
+                    response = requests.get("https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z", stream=True)
+                    total_length = response.headers.get('content-length')
+                    ffmpeg = b""
 
-                if total_length is None:
-                    ffmpeg += response.content
-                else:
-                    dl = 0
-                    total_length = int(total_length)
-                    ffmpeg_progressbar = QtWidgets.QProgressDialog("Downloading FFMPEG", "Abort", 0, total_length)
-                    ffmpeg_progressbar.canceled.connect(app.quit)
-                    ffmpeg_progressbar.setModal(True)
-                    ffmpeg_progressbar.show()
-                    for data in response.iter_content(chunk_size=65536):
-                        app.processEvents()
-                        dl += len(data)
-                        ffmpeg += data
-                        ffmpeg_progressbar.setValue(dl)
-                    ffmpeg_progressbar.hide()
+                    if total_length is None:
+                        ffmpeg += response.content
+                    else:
+                        dl = 0
+                        total_length = int(total_length)
+                        ffmpeg_progressbar = QtWidgets.QProgressDialog("Downloading FFMPEG", "Abort", 0, total_length)
+                        ffmpeg_progressbar.canceled.connect(app.quit)
+                        ffmpeg_progressbar.setModal(True)
+                        ffmpeg_progressbar.show()
+                        for data in response.iter_content(chunk_size=65536):
+                            app.processEvents()
+                            dl += len(data)
+                            ffmpeg += data
+                            ffmpeg_progressbar.setValue(dl)
+                        ffmpeg_progressbar.hide()
 
-                open("temp/ffmpeg.7z", "wb").write(ffmpeg)
+                    open("temp/ffmpeg.7z", "wb").write(ffmpeg)
 
-                if not os.path.isdir("temp/ffmpeg"):
-                    os.mkdir("temp/ffmpeg")
+                    if not os.path.isdir("temp/ffmpeg"):
+                        os.mkdir("temp/ffmpeg")
 
-                Archive("temp/ffmpeg.7z").extractall("temp/ffmpeg/")
-                shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffmpeg.exe", "ffmpeg.exe")
-                shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffplay.exe", "ffplay.exe")
-                shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffprobe.exe", "ffprobe.exe")
-                
-                shutil.rmtree("temp")
+                    Archive("temp/ffmpeg.7z").extractall("temp/ffmpeg/")
+                    shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffmpeg.exe", "ffmpeg.exe")
+                    shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffplay.exe", "ffplay.exe")
+                    shutil.copy(f"temp/ffmpeg/{os.listdir('temp/ffmpeg')[0]}/bin/ffprobe.exe", "ffprobe.exe")
+                    
+                    shutil.rmtree("temp")
+            else:
+                QtWidgets.QMessageBox.warning(self, "No FFMPEG found.", "No FFMPEG found. You have to install it yourself.", QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)                
         
         self.log_print("[INFO] Initialized")
     
@@ -234,7 +238,7 @@ class TCBPP(QtWidgets.QWidget):
         self.log_info("Done!")
     
     def browse_replay(self) -> None:
-        path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Supported Macros (*.txt *.echo *.json)")
+        path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Supported Macros (*.txt *.echo *.json *.replay)")
         if path and ok:
             self.ui.replay_lineedit.setText(os.path.basename(path))
             if os.path.basename(path).split(".")[-1] == "echo":
@@ -313,7 +317,38 @@ class TCBPP(QtWidgets.QWidget):
             
             self.log_info("Successfully decoded \"TasBot\" replay!")
         elif macro_type == 3:
-            self.log_debug("ReplayBot is not yet supported!")
+            with open(path, "rb") as f:
+                length = os.path.getsize(path)
+                magic = f.read(4)
+                if magic != b"RPLY":
+                    self.log_error("This macro is either too old or corrupted")
+                    return
+            
+                version = int.from_bytes(f.read(1), "big")
+                frames = False
+                if version == 2:
+                    frames = int.from_bytes(f.read(1), "big") == 1
+                
+                if frames:
+                    fps = struct.unpack("f", f.read(4))[0]
+                    self.ui.fps_spinbox.setValue(fps)
+                    
+                    self.ui.replay_table.setRowCount((length - f.tell()) / 5)
+                    
+                    for k, i in enumerate(range(0, (length - f.tell()), 5)):
+                        frame = int.from_bytes(f.read(4), "little")
+                        state = int.from_bytes(f.read(1), "little")
+                        p1 = not not state & 0x1
+                        p2 = not not state >> 1
+                        self.ui.replay_table.setItem(k, 0, QtWidgets.QTableWidgetItem(str(frame)))
+                        self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold" if p1 else "Release"))
+                        self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Hold" if p2 else "Release"))
+                        
+                else:
+                    self.log_error("This macro is not recorded with frames")
+                    return
+            self.log_info("Successfully decoded \"ReplayBot\" replay!")
+    
     
     def convert(self, array: list) -> list:
         old = array[0]
