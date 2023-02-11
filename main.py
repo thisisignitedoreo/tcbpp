@@ -241,11 +241,13 @@ class TCBPP(QtWidgets.QWidget):
         path, ok = QtWidgets.QFileDialog.getOpenFileName(None, "Select Replay...", None, "Supported Macros (*.txt *.echo *.json *.replay)")
         if path and ok:
             self.ui.replay_lineedit.setText(os.path.basename(path))
-            if os.path.basename(path).split(".")[-1] == "echo":
+            if os.path.basename(path).endswith(".echo"): 
                 self.load_replay(path, 1)
-            elif os.path.basename(path).split(".")[-1] == "json":
+            elif os.path.basename(path).endswith(".mcb.json"):
+                self.load_replay(path, 4)
+            elif os.path.basename(path).endswith(".json"):
                 self.load_replay(path, 2)
-            elif os.path.basename(path).split(".")[-1] == "replay":
+            elif os.path.basename(path).endswith(".replay"):
                 self.load_replay(path, 3)
             else:
                 self.log_warn("Could not determine macro type. Defaulting to \"Plain Text\"")
@@ -348,6 +350,20 @@ class TCBPP(QtWidgets.QWidget):
                     self.log_error("This macro is not recorded with frames")
                     return
             self.log_info("Successfully decoded \"ReplayBot\" replay!")
+        elif macro_type == 4:
+            json_data = json.load(open(path))
+            self.ui.fps_spinbox.setValue(json_data["fps"])
+            
+            replay = [[i["frame"], i["press"], i["player2"]] for i in json_data["actions"]]
+            
+            self.ui.replay_table.setRowCount(len(replay) - 1)
+            
+            for k, i in enumerate(replay):
+                self.ui.replay_table.setItem(k, 0, QtWidgets.QTableWidgetItem(str(i[0])))
+                self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Release" if i[1] else "Hold"))
+                self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Release" if i[2] else "Hold"))
+            
+            self.log_info("Successfully decoded \"MacroBot\" replay!")
     
     
     def convert(self, array: list) -> list:
