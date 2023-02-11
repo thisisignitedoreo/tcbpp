@@ -24,6 +24,7 @@ $ python main.py
 | + 2.wav
 | + 3.wav
 + p1
+| |
 | + holds
 | | |
 | | + 1.wav
@@ -35,6 +36,7 @@ $ python main.py
 |   + 2.wav
 |   + 3.wav
 + p2 (optional)
+  |
   + holds
   | |
   | + 1.wav
