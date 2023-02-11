@@ -171,6 +171,42 @@
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="softclicks_layout">
+         <item>
+          <widget class="QCheckBox" name="sc_checkbox">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Softclicks</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="sc_spinbox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="suffix">
+            <string> ms</string>
+           </property>
+           <property name="maximum">
+            <number>10000</number>
+           </property>
+           <property name="singleStep">
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>200</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="hardclicks_layout">
          <item>
           <widget class="QCheckBox" name="hc_checkbox">
@@ -204,42 +240,6 @@
            </property>
            <property name="value">
             <number>500</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="softclicks_layout">
-         <item>
-          <widget class="QCheckBox" name="sc_checkbox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>Softclicks</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="sc_spinbox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="suffix">
-            <string> ms</string>
-           </property>
-           <property name="maximum">
-            <number>10000</number>
-           </property>
-           <property name="singleStep">
-            <number>10</number>
-           </property>
-           <property name="value">
-            <number>200</number>
            </property>
           </widget>
          </item>
@@ -379,6 +379,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="res_rc.qrc"/>
+ </resources>
  <connections/>
 </ui>

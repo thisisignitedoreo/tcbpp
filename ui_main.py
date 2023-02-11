@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QProgressBar, QPushButton, QRadioButton, QSizePolicy,
     QSpacerItem, QSpinBox, QTableWidget, QTableWidgetItem,
     QTextEdit, QToolButton, QVBoxLayout, QWidget)
+import res_rc
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -137,27 +138,6 @@ class Ui_Form(object):
 
         self.settings_layout.addLayout(self.fps_layout)
 
-        self.hardclicks_layout = QHBoxLayout()
-        self.hardclicks_layout.setObjectName(u"hardclicks_layout")
-        self.hc_checkbox = QCheckBox(Form)
-        self.hc_checkbox.setObjectName(u"hc_checkbox")
-        self.hc_checkbox.setEnabled(True)
-        self.hc_checkbox.setChecked(True)
-
-        self.hardclicks_layout.addWidget(self.hc_checkbox)
-
-        self.hc_spinbox = QSpinBox(Form)
-        self.hc_spinbox.setObjectName(u"hc_spinbox")
-        self.hc_spinbox.setEnabled(False)
-        self.hc_spinbox.setMaximum(10000)
-        self.hc_spinbox.setSingleStep(10)
-        self.hc_spinbox.setValue(500)
-
-        self.hardclicks_layout.addWidget(self.hc_spinbox)
-
-
-        self.settings_layout.addLayout(self.hardclicks_layout)
-
         self.softclicks_layout = QHBoxLayout()
         self.softclicks_layout.setObjectName(u"softclicks_layout")
         self.sc_checkbox = QCheckBox(Form)
@@ -178,6 +158,27 @@ class Ui_Form(object):
 
 
         self.settings_layout.addLayout(self.softclicks_layout)
+
+        self.hardclicks_layout = QHBoxLayout()
+        self.hardclicks_layout.setObjectName(u"hardclicks_layout")
+        self.hc_checkbox = QCheckBox(Form)
+        self.hc_checkbox.setObjectName(u"hc_checkbox")
+        self.hc_checkbox.setEnabled(True)
+        self.hc_checkbox.setChecked(True)
+
+        self.hardclicks_layout.addWidget(self.hc_checkbox)
+
+        self.hc_spinbox = QSpinBox(Form)
+        self.hc_spinbox.setObjectName(u"hc_spinbox")
+        self.hc_spinbox.setEnabled(False)
+        self.hc_spinbox.setMaximum(10000)
+        self.hc_spinbox.setSingleStep(10)
+        self.hc_spinbox.setValue(500)
+
+        self.hardclicks_layout.addWidget(self.hc_spinbox)
+
+
+        self.settings_layout.addLayout(self.hardclicks_layout)
 
         self.enddelay_layout = QHBoxLayout()
         self.enddelay_layout.setObjectName(u"enddelay_layout")
@@ -285,11 +286,11 @@ class Ui_Form(object):
         self.update_button.setText(QCoreApplication.translate("Form", u"Update", None))
         self.fps_label.setText(QCoreApplication.translate("Form", u"FPS:", None))
         self.fps_spinbox.setSuffix(QCoreApplication.translate("Form", u" FPS", None))
+        self.sc_checkbox.setText(QCoreApplication.translate("Form", u"Softclicks", None))
+        self.sc_spinbox.setSuffix(QCoreApplication.translate("Form", u" ms", None))
         self.hc_checkbox.setText(QCoreApplication.translate("Form", u"Hardclicks", None))
         self.hc_spinbox.setSuffix(QCoreApplication.translate("Form", u" ms", None))
         self.hc_spinbox.setPrefix("")
-        self.sc_checkbox.setText(QCoreApplication.translate("Form", u"Softclicks", None))
-        self.sc_spinbox.setSuffix(QCoreApplication.translate("Form", u" ms", None))
         self.ed_label.setText(QCoreApplication.translate("Form", u"End delay:", None))
         self.ed_spinbox.setSuffix(QCoreApplication.translate("Form", u" seconds", None))
         self.mp3_checkbox.setText(QCoreApplication.translate("Form", u"Save as MP3 (compressed)", None))

@@ -67,7 +67,7 @@ class TCBPP(QtWidgets.QWidget):
         self.ui.clickpack_combo.addItems(self.clickpacks)
         
         self.connect()
-        app.setWindowIcon(QtGui.QIcon(self.get_qpix_from_filename("assets/tcb-col.png")))
+        app.setWindowIcon(QtGui.QIcon(":/assets/tcb-col.png"))
 
         if shutil.which("ffmpeg") is None:
             if os.name == "nt":
@@ -138,12 +138,12 @@ class TCBPP(QtWidgets.QWidget):
             app.setPalette(self.white_palette)
             app.setStyleSheet("")
             settings["theme"] = "white"
-            self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-bl-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
+            self.ui.icon.setPixmap(QtGui.QPixmap(":/assets/tcb-bl-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
         elif theme == True:
             app.setPalette(self.dark_palette)
             app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
             settings["theme"] = "dark"
-            self.ui.icon.setPixmap(self.get_qpix_from_filename("assets/tcb-col-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
+            self.ui.icon.setPixmap(QtGui.QPixmap(":/assets/tcb-col-transp-2-1.png").scaled(64, 32, mode=QtCore.Qt.SmoothTransformation))
         
         with open("settings.json", "w") as file:
             file.write(json.dumps(settings))
@@ -389,12 +389,6 @@ class TCBPP(QtWidgets.QWidget):
     
     def log_print(self, text: str) -> None:
         self.ui.log.setPlainText(self.ui.log.toPlainText() + text)
-
-    def get_qpix_from_filename(self, path):
-        data_str = open(path, "rb").read()
-        qpix = QtGui.QPixmap()
-        qpix.loadFromData(data_str)
-        return qpix
 
 
 if __name__ == "__main__":
