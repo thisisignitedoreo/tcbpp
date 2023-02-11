@@ -1,10 +1,10 @@
 <RCC>
   <qresource prefix="assets">
-    <file>tcb-bl.png</file>
-    <file>tcb-bl-transp.png</file>
-    <file>tcb-bl-transp-2-1.png</file>
-    <file>tcb-col.png</file>
-    <file>tcb-col-transp.png</file>
-    <file>tcb-col-transp-2-1.png</file>
+    <file>assets/tcb-bl.png</file>
+    <file>assets/tcb-bl-transp.png</file>
+    <file>assets/tcb-bl-transp-2-1.png</file>
+    <file>assets/tcb-col.png</file>
+    <file>assets/tcb-col-transp.png</file>
+    <file>assets/tcb-col-transp-2-1.png</file>
   </qresource>
 </RCC>
