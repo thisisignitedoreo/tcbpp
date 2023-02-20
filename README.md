@@ -2,7 +2,7 @@
 <img alt="logo" src="assets/tcb-col-transp-2-1.png" height="64" width="128">
 
 # TCB++
-Supported macro types: maxnut's MacroBot, ReplayBot, TasBot, EchoBot, Plain Text (frames)
+Supported macro types: DashReplay, maxnut's MacroBot, ReplayBot, TasBot, EchoBot, Plain Text (frames)
 
 ## Quickstart
 ```shell
