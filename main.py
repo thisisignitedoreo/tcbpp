@@ -246,7 +246,11 @@ class TCBPP(QtWidgets.QWidget):
             elif os.path.basename(path).endswith(".mcb.json"):
                 self.load_replay(path, 4)
             elif os.path.basename(path).endswith(".json"):
-                self.load_replay(path, 2)
+                file = json.loads(open(path).read())
+                if file.get("actions") is None:
+                    self.load_replay(path, 2)
+                else:
+                    self.load_replay(path, 5)
             elif os.path.basename(path).endswith(".replay"):
                 self.load_replay(path, 3)
             else:
@@ -364,6 +368,23 @@ class TCBPP(QtWidgets.QWidget):
                 self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Release" if i[2] else "Hold"))
             
             self.log_info("Successfully decoded \"MacroBot\" replay!")
+        elif macro_type == 5:
+            json_data = json.load(open(path))
+            self.ui.fps_spinbox.setValue(json_data["fps"])
+            
+            replay = self.convert([i["down"] for i in json_data["actions"]])
+            
+            self.ui.replay_table.setRowCount(len(replay) - 1)
+            
+            for k, i in enumerate(replay):
+                self.ui.replay_table.setItem(k, 0, QtWidgets.QTableWidgetItem(str(i[0])))
+                if i[1] == False:
+                    self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Release"))
+                elif i[1] == True:
+                    self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
+                self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem(""))
+            
+            self.log_info("Successfully decoded \"DashReplay API v4\" replay!")
     
     
     def convert(self, array: list) -> list:
