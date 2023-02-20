@@ -384,7 +384,7 @@ class TCBPP(QtWidgets.QWidget):
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
                 self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem(""))
             
-            self.log_info("Successfully decoded \"DashReplay API v4\" replay!")
+            self.log_info("Successfully decoded \"DashReplay\" replay!")
     
     
     def convert(self, array: list) -> list:
