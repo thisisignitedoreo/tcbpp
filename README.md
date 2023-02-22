@@ -1,8 +1,10 @@
-
+<p align=center>
 <img alt="logo" src="assets/tcb-col-transp-2-1.png" height="64" width="128">
-
-# TCB++
+</p>
+<h1 align=center>TCB++</h1>
 Supported macro types: DashReplay, maxnut's MacroBot, ReplayBot, TasBot, EchoBot, Plain Text (frames)
+
+Also, there are console version (with arguments and stuff, for automating purposes)
 
 ## Quickstart
 ```shell
