@@ -57,3 +57,4 @@ Example in `clickpacks` folder ~~(its outdated and dont work sowwy)~~ it works n
 
 ## Links
 [TobyAdd's Discord](https://discord.com/invite/mQHXzG72vU)
+[tcb++ Discord](https://discord.com/invite/RWVC67qkEA)
