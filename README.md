@@ -12,6 +12,7 @@ $ pip install -r requirements.txt
 $ python main.py
 ```
 OR
+
 Download `tcb++.exe` from release (DUH)
 ## Clickpack folder structure
 ```
