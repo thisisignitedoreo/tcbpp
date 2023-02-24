@@ -244,6 +244,6 @@ types = {
 }
 
 if args.type is not None:
-    render_audio(load_macro(args.input_path, types[args.type]))
+    render_audio(load_macro(args.input_path, types[args.type]), args.clickpack, args.end_delay, args.output_path, args.mp3_export, args.softclick_delay, args.hardclick_delay, args.softclicks, args.hardclicks)
 else:
     render_audio(recognize_macro(args.input_path), args.clickpack, args.end_delay, args.output_path, args.mp3_export, args.softclick_delay, args.hardclick_delay, args.softclicks, args.hardclicks)
