@@ -220,6 +220,8 @@ def render_audio(macro, clickpack, end_delay, out_path, mp3_export, soft_delay, 
     else:
         output.export(out_path, format="wav", bitrate="320k")
 
+print("tcb++ version 1.1")
+
 parser = ArgumentParser(prog="tcb++ console", description="console version of tcb++")
 parser.add_argument("-i", "--input", dest="input_path", required=True, help="input file")
 parser.add_argument("-o", "--output", dest="output_path", required=True, help="output file")
