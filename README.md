@@ -11,6 +11,8 @@ Also, there are console version (with arguments and stuff, for automating purpos
 $ pip install -r requirements.txt
 $ python main.py
 ```
+OR
+Download `tcb++.exe` from release (DUH)
 ## Clickpack folder structure
 ```
 [clickpack name]
@@ -50,11 +52,12 @@ $ python main.py
     + 2.wav
     + 3.wav
 ```
-Example in `clickpacks` folder ~~(its outdated and dont work sowwy)~~ it works now
+Example in `clickpacks` folder
 
 ## Gallery
 ![sc1](screenshot1.png)
 
 ## Links
 [TobyAdd's Discord](https://discord.com/invite/mQHXzG72vU)
+
 [tcb++ Discord](https://discord.com/invite/RWVC67qkEA)
