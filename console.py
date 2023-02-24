@@ -2,7 +2,11 @@ from argparse import ArgumentParser
 from pydub import AudioSegment
 import random
 import json
+import lib
 import os
+
+def print_progress_bar(value, max_value, pb_len):
+    print(f"[{''.join(['#' if i / pb_len < value / max_value else ' ' for i in range(pb_len)])}], {round(value / max_value * 100)}%", end="\r")
 
 def recognize_macro(path):
     if os.path.basename(path).endswith(".echo"): 
@@ -22,9 +26,6 @@ def recognize_macro(path):
         return load_macro(path, 0)
 
 def load_macro(path, macro_type):
-    if macro_type not in (0, 5):
-        print("unsupported")
-        exit(1)
     if macro_type == 0:
         print("Type: Plain Text (frames)")
         replay_list = open(path).readlines()
@@ -214,13 +215,15 @@ def render_audio(macro, clickpack, end_delay, out_path, mp3_export, soft_delay, 
             elif not i[2] is True:
                 output = output.overlay(AudioSegment.from_wav(add_end(clickpack, "/") + f"p{'1' if p1_overrides_p2 else '2'}/releases/" + random.choice(releases_p2)),
                                         position=i[0] / fps * 1000)
+        print_progress_bar(k, len(macro["actions"]), os.get_terminal_size()[0] - 10)
+    print()
     
     if mp3_export:
         output.export(out_path, format="mp3", bitrate="320k")
     else:
         output.export(out_path, format="wav", bitrate="320k")
 
-print("tcb++ version 1.1")
+print(f"tcb++ version {lib.ver}")
 
 parser = ArgumentParser(prog="tcb++ console", description="console version of tcb++")
 parser.add_argument("-i", "--input", dest="input_path", required=True, help="input file")

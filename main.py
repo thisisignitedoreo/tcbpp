@@ -12,6 +12,7 @@ import random
 import shutil
 import json
 import sys
+import lib
 import os
 import io
 
@@ -59,6 +60,8 @@ class TCBPP(QtWidgets.QWidget):
             self.ui.dark_checkbox.setChecked(True)
             self.ui.light_checkbox.setChecked(False)
         
+        self.Form.setWindowTitle(f"tcb++ {lib.ver}")
+
         if not os.path.isdir("clickpacks"):
             os.mkdir("clickpacks")
         
@@ -155,7 +158,7 @@ class TCBPP(QtWidgets.QWidget):
         
         self.ui.progress_bar.setValue(0)
         ms_duration = ((float(self.ui.replay_table.item(self.ui.replay_table.rowCount() - 1, 0).text()) / self.ui.fps_spinbox.value()) * 1000)
-        output = AudioSegment.silent(duration=ms_duration + self.ui.ed_spinbox.value() * 1000)
+        output = AudioSegment.silent(duration=ms_duration + self.ui.ed_spinbox.value())
         self.ui.progress_bar.setMaximum(self.ui.replay_table.rowCount())
         
         p1_overrides_p2 = False
