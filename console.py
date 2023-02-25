@@ -121,14 +121,15 @@ def load_macro(path, macro_type):
         json_data = json.load(open(path))
         print(f"FPS: {json_data['fps']}")
         
-        replay = convert([i["down"] for i in json_data["actions"]])
+        replay1 = convert([i["down"] for i in json_data["actions"]])
+        replay2 = convert([i["player"] for i in json_data["actions"]])
         
         macro = []
 
         print(f"Macro Length: {len(replay) - 1}")
         
-        for k, i in enumerate(replay):
-            macro.append([i[0], i[1], None])
+        for k, i in enumerate(replay1):
+            macro.append([i[0], i[1], replay2[k][1]])
 
         return {"fps": json_data["fps"], "actions": macro}
 

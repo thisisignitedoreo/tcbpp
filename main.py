@@ -60,7 +60,7 @@ class TCBPP(QtWidgets.QWidget):
             self.ui.dark_checkbox.setChecked(True)
             self.ui.light_checkbox.setChecked(False)
         
-        self.Form.setWindowTitle(f"tcb++ {lib.ver}")
+        self.setWindowTitle(f"tcb++ {lib.ver}")
 
         if not os.path.isdir("clickpacks"):
             os.mkdir("clickpacks")
@@ -375,17 +375,21 @@ class TCBPP(QtWidgets.QWidget):
             json_data = json.load(open(path))
             self.ui.fps_spinbox.setValue(json_data["fps"])
             
-            replay = self.convert([i["down"] for i in json_data["actions"]])
+            replay1 = self.convert([i["down"] for i in json_data["actions"]])
+            replay2 = self.convert([i["player"] for i in json_data["actions"]])
             
             self.ui.replay_table.setRowCount(len(replay) - 1)
             
-            for k, i in enumerate(replay):
+            for k, i in enumerate(replay1):
                 self.ui.replay_table.setItem(k, 0, QtWidgets.QTableWidgetItem(str(i[0])))
                 if i[1] == False:
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Release"))
                 elif i[1] == True:
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
-                self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem(""))
+                if replay2p[k][1] == False:
+                    self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Release"))
+                elif replay2p[k][1] == True:
+                    self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Hold"))
             
             self.log_info("Successfully decoded \"DashReplay\" replay!")
     
