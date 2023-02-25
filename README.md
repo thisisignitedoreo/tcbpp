@@ -2,7 +2,7 @@
 <img alt="logo" src="assets/tcb-col-transp-2-1.png" height="64" width="128">
 </p>
 <h1 align=center>tcb++</h1>
-Supported macro types: DashReplay, maxnut's MacroBot, ReplayBot, TasBot, EchoBot, Plain Text (frames)
+Supported macro types: DashReplay, maxnut's MacroBot, ReplayBot, TasBot, EchoBot (player 1 only), Plain Text (frames)
 
 Also, there are console version (with arguments and stuff, for automating purposes)
 
