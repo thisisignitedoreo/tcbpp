@@ -121,17 +121,40 @@ def load_macro(path, macro_type):
         json_data = json.load(open(path))
         print(f"FPS: {json_data['fps']}")
         
-        replay1 = convert([i["down"] for i in json_data["actions"]])
-        replay2 = convert([i["player"] for i in json_data["actions"]])
+        replay1 = convert([i["down"] for i in json_data["actions"] if i["player"]])
+        replay2 = convert([i["down"] for i in json_data["actions"] if not i["player"]])
         
-        macro = []
+        replay = combine(replay1, replay2)
 
         print(f"Macro Length: {len(replay) - 1}")
-        
-        for k, i in enumerate(replay1):
-            macro.append([i[0], i[1], replay2[k][1]])
 
-        return {"fps": json_data["fps"], "actions": macro}
+        count = {}
+
+        # Toby-error checking
+
+        for i in json_data["actions"]:
+            if count.get(i["frame"]) is None:
+                count[i["frame"]] = 0
+            else:
+                count[i["frame"]] += 1
+
+        for k, i in count.items():
+            if i not in (1, 2):
+                print(f"W: Entry's with frame {k} is not exacly 1 or 2! ({i}) This may be DashReplay bug, report it on DashReplay server.")
+
+        return {"fps": json_data["fps"], "actions": replay}
+
+def combine(macro1p, macro2p):
+    res = {}
+    for i in macro1p:
+        res[i[0]] = [i[1], None]
+    for j in macro2p:
+        if j[0] not in res.keys():
+            res[j[0]] = [None, None]
+    for j in macro2p:
+        res[j[0]] = [res[j[0]][1], j[1]]
+
+    return sorted([[k, *i] for k, i in res.items()], key=lambda x: x[0])
 
 def convert(array):
     old = array[0]
@@ -165,12 +188,14 @@ def render_audio(macro, clickpack, end_delay, out_path, mp3_export, soft_delay, 
     try:
         softclicks = os.listdir(add_end(clickpack, "/") + "softclicks")
     except FileNotFoundError:
-        print("No softclicks found in clickpack! Turning it off.")
+        if soft:
+            print("No softclicks found in clickpack! Turning it off.")
         soft = False
     try:
         hardclicks = os.listdir(add_end(clickpack, "/") + "hardclicks")
     except FileNotFoundError:
-        print("No hardclicks found in clickpack! Turning it off.")
+        if hard:
+            print("No hardclicks found in clickpack! Turning it off.")
         hard = False
     for k, i in enumerate(macro["actions"]):
         if k == 0:
