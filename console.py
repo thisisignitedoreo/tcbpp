@@ -121,8 +121,8 @@ def load_macro(path, macro_type):
         json_data = json.load(open(path))
         print(f"FPS: {json_data['fps']}")
         
-        replay1 = convert([i["down"] for i in json_data["actions"] if i["player"]])
-        replay2 = convert([i["down"] for i in json_data["actions"] if not i["player"]])
+        replay1 = convert([i["down"] for i in json_data["actions"] if i["player"]], start=json_data["actions"][0]["frame"])
+        replay2 = convert([i["down"] for i in json_data["actions"] if not i["player"]], start=json_data["actions"][0]["frame"])
         
         replay = combine(replay1, replay2)
 
@@ -156,12 +156,12 @@ def combine(macro1p, macro2p):
 
     return sorted([[k, *i] for k, i in res.items()], key=lambda x: x[0])
 
-def convert(array):
+def convert(array, start=0):
     old = array[0]
-    res = [[0, old]]
+    res = [[start, old]]
     for k, i in enumerate(array):
         if i != old:
-            res.append([k, i])
+            res.append([k + start, i])
         old = i
     return res
 

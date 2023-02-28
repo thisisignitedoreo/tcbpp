@@ -375,31 +375,31 @@ class TCBPP(QtWidgets.QWidget):
             json_data = json.load(open(path))
             self.ui.fps_spinbox.setValue(json_data["fps"])
             
-            replay1 = self.convert([i["down"] for i in json_data["actions"]])
-            replay2 = self.convert([i["player"] for i in json_data["actions"]])
+            replay1 = self.convert([i["down"] for i in json_data["actions"] if i["player"], start=json_data["actions"][0]["frame"])
+            replay2 = self.convert([i["down"] for i in json_data["actions"] if not i["player"]], start=json_data["actions"][0]["frame"])
             
             self.ui.replay_table.setRowCount(len(replay) - 1)
             
             for k, i in enumerate(replay1):
                 self.ui.replay_table.setItem(k, 0, QtWidgets.QTableWidgetItem(str(i[0])))
-                if i[1] == False:
+                if i[1] is False:
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Release"))
-                elif i[1] == True:
+                elif i[1] is True:
                     self.ui.replay_table.setItem(k, 1, QtWidgets.QTableWidgetItem("Hold"))
-                if replay2p[k][1] == False:
+                if i[2] is False:
                     self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Release"))
-                elif replay2p[k][1] == True:
+                elif i[2] is True:
                     self.ui.replay_table.setItem(k, 2, QtWidgets.QTableWidgetItem("Hold"))
             
             self.log_info("Successfully decoded \"DashReplay\" replay!")
     
     
-    def convert(self, array: list) -> list:
+    def convert(self, array: list, start: int=0) -> list:
         old = array[0]
-        res = [[0, old]]
+        res = [[start, old]]
         for k, i in enumerate(array):
             if i != old:
-                res.append([k, i])
+                res.append([k + start, i])
             old = i
         return res
     
