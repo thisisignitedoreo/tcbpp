@@ -375,7 +375,7 @@ class TCBPP(QtWidgets.QWidget):
             json_data = json.load(open(path))
             self.ui.fps_spinbox.setValue(json_data["fps"])
             
-            replay1 = self.convert([i["down"] for i in json_data["actions"] if i["player"], start=json_data["actions"][0]["frame"])
+            replay1 = self.convert([i["down"] for i in json_data["actions"] if i["player"]], start=json_data["actions"][0]["frame"])
             replay2 = self.convert([i["down"] for i in json_data["actions"] if not i["player"]], start=json_data["actions"][0]["frame"])
             
             self.ui.replay_table.setRowCount(len(replay) - 1)

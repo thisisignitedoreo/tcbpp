@@ -8,24 +8,24 @@ import os
 def print_progress_bar(value, max_value, pb_len):
     print(f"[{''.join(['#' if i / pb_len < value / max_value else ' ' for i in range(pb_len)])}], {round(value / max_value * 100)}%", end="\r")
 
-def recognize_macro(path):
+def recognize_macro(path, end_frame):
     if os.path.basename(path).endswith(".echo"): 
-        return load_macro(path, 1)
+        return load_macro(path, 1, end_frame)
     elif os.path.basename(path).endswith(".mcb.json"):
-        return load_macro(path, 4)
+        return load_macro(path, 4, end_frame)
     elif os.path.basename(path).endswith(".json"):
         file = json.loads(open(path).read())
         if file.get("actions") is None:
-            return load_macro(path, 2)
+            return load_macro(path, 2, end_frame)
         else:
-            return load_macro(path, 5)
+            return load_macro(path, 5, end_frame)
     elif os.path.basename(path).endswith(".replay"):
-        return load_macro(path, 3)
+        return load_macro(path, 3, end_frame)
     else:
         print("Can't determine macro type, selecting Plain Text. You can manually set type by --type argument.")
-        return load_macro(path, 0)
+        return load_macro(path, 0, end_frame)
 
-def load_macro(path, macro_type):
+def load_macro(path, macro_type, end_frame):
     if macro_type == 0:
         print("Type: Plain Text (frames)")
         replay_list = open(path).readlines()
@@ -42,6 +42,9 @@ def load_macro(path, macro_type):
             # pl_1: not not int(splitted[1])
             # pl_2: not not int(splitted[2])
             macro["actions"].append([int(splited[0]), not not int(splited[1]), not not int(splited[2])])
+
+        macro["actions"] = cut_to_end_frame(macro["actions"], end_frame)
+
         return macro
 
     elif macro_type == 1:
@@ -57,6 +60,8 @@ def load_macro(path, macro_type):
         for k, i in enumerate(replay):
             macro.append([i[0], i[1], None])
         
+        macro = cut_to_end_frame(macro, end_frame)
+
         return {"fps": json_data["FPS"], "actions": macro}
     elif macro_type == 2:
         print("Type: TasBot")
@@ -72,6 +77,8 @@ def load_macro(path, macro_type):
         for k, i in enumerate(replay):
             macro.append([i[0], [None, False, True][i[1]], [None, False, True][i[2]]])
         
+        macro = cut_to_end_frame(macro, end_frame)
+
         return {"fps": json_data["fps"], "actions": macro}
     elif macro_type == 3:
         print("Type: ReplayBot")
@@ -101,6 +108,8 @@ def load_macro(path, macro_type):
                     p1 = not not state & 0x1
                     p2 = not not state >> 1
                     macro.append([frame, p1, p2])
+                
+                macro = cut_to_end_frame(macro, end_frame)
                 return {"fps": fps, "actions": macro}
             else:
                 print("This macro is not recorded with frames")
@@ -115,6 +124,8 @@ def load_macro(path, macro_type):
         
         replay = [[i["frame"], i["press"], i["player2"]] for i in json_data["actions"]]
         
+        replay = cut_to_end_frame(replay, end_frame)
+
         return {"fps": json_data["fps"], "actions": replay}
     elif macro_type == 5:
         print("Type: DashReplay")
@@ -142,7 +153,17 @@ def load_macro(path, macro_type):
             if i not in (1, 2):
                 print(f"W: Entry's with frame {k} is not exacly 1 or 2! ({i}) This may be DashReplay bug, report it on DashReplay server.")
 
+        replay = cut_to_end_frame(replay, end_frame)
+
         return {"fps": json_data["fps"], "actions": replay}
+
+def cut_to_end_frame(macro, end_frame):
+    res = []
+    for i in macro:
+        if i[0] > end_frame:
+            break
+        res.append(i)
+    return res
 
 def combine(macro1p, macro2p):
     res = {}
@@ -256,6 +277,7 @@ parser.add_argument("-i", "--input", dest="input_path", required=True, help="inp
 parser.add_argument("-o", "--output", dest="output_path", required=True, help="output file")
 parser.add_argument("--clickpack", dest="clickpack", required=True, help="clickpack folder")
 parser.add_argument("--end-delay", dest="end_delay", required=False, default=3, type=int, help="end delay (int)")
+parser.add_argument("--end-frame", dest="end_frame", required=False, default=-1, type=int, help="render all frames before thet frame, but not after")
 parser.add_argument("--mp3-export", dest="mp3_export", required=False, default=False, action="store_true", help="export as mp3?")
 parser.add_argument("--softclicks", dest="softclicks", required=False, action="store_true", help="use softclicks?")
 parser.add_argument("--hardclicks", dest="hardclicks", required=False, action="store_true", help="use hardclicks?")
@@ -275,6 +297,6 @@ types = {
 }
 
 if args.type is not None:
-    render_audio(load_macro(args.input_path, types[args.type]), args.clickpack, args.end_delay, args.output_path, args.mp3_export, args.softclick_delay, args.hardclick_delay, args.softclicks, args.hardclicks)
+    render_audio(load_macro(args.input_path, types[args.type], args.end_frame), args.clickpack, args.end_delay, args.output_path, args.mp3_export, args.softclick_delay, args.hardclick_delay, args.softclicks, args.hardclicks)
 else:
-    render_audio(recognize_macro(args.input_path), args.clickpack, args.end_delay, args.output_path, args.mp3_export, args.softclick_delay, args.hardclick_delay, args.softclicks, args.hardclicks)
+    render_audio(recognize_macro(args.input_path, args.end_frame), args.clickpack, args.end_delay, args.output_path, args.mp3_export, args.softclick_delay, args.hardclick_delay, args.softclicks, args.hardclicks)
